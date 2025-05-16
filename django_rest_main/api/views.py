@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render,get_object_or_404
 from django.http import HttpResponse,JsonResponse
 from django.core import serializers
 from students.models import Student
@@ -22,3 +22,32 @@ def studentsView(request):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
+@api_view(['PUT','PATCH','GET'])
+def studentDetailView(request,pk):
+    try:
+        model_data=get_object_or_404(Student,pk=pk)
+        #modified_data=StudentSerializer(model_data,data=request.data)
+       # if modified_data.is_valid():
+          #  modified_data.save()
+          # # serializer=StudentSerializer(model_data)
+            #return Response(modified_data.data,status=status.HTTP_200_OK)
+    except :
+        return Response({'message':'Sorry not found'},status=status.HTTP_400_BAD_REQUEST)
+
+    if request.method =='GET':
+        #student_data=Student.objects.all()
+        serializer=StudentSerializer(model_data)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    elif request.method=='PATCH':
+        serializers=StudentSerializer(model_data,data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data,status=status.HTTP_202_ACCEPTED)
+    else:
+        serializers = StudentSerializer(model_data, data=request.data)
+        if serializers.is_valid():
+            serializers.save()
+            return Response(serializers.data, status=status.HTTP_202_ACCEPTED)
+        else:
+            return Response(serializers.errors,status=status.HTTP_400_BAD_REQUEST)
+
