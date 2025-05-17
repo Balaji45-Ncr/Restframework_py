@@ -10,6 +10,7 @@ from rest_framework.decorators import api_view
 from rest_framework.mixins import ListModelMixin,RetrieveModelMixin,UpdateModelMixin,DestroyModelMixin,CreateModelMixin
 from rest_framework.views import APIView
 from rest_framework import generics
+from django.core.exceptions import ValidationError
 # Create your views here.
 @api_view(['GET','POST'])
 def studentsView(request):
@@ -124,13 +125,52 @@ DestroyModelMixin      ------------------->destroy()
 syntax: class Employees(mixins,generics.GenericAPIView)
 
 generics acts as foundational class for building most api views and essentials functionalities for handling http request(get,put,post,delete)
+
+request handling and response generation was taken care by generics and core functionalities of crud taken care by mixins
 '''
-class Employees(ListModelMixin,CreateModelMixin,generics.GenericAPIView):
+# class Employees(ListModelMixin,CreateModelMixin,generics.GenericAPIView):
+#     queryset = Employee.objects.all()
+#     serializer_class = EmployeeSerializer
+#
+#     def get(self,request,*args,**kwargs):
+#         return self.list(request,*args,**kwargs)
+#
+#     def post(self,request,*args,**kwargs):
+#         return self.create(request,*args,**kwargs)
+#
+# class Employees_obj(RetrieveModelMixin,UpdateModelMixin,DestroyModelMixin,generics.GenericAPIView):
+#     queryset = Employee.objects.all()
+#     serializer_class = EmployeeSerializer
+#
+#     def get(self,request,pk,*args,**kwargs):
+#         return self.retrieve(request,pk=pk,*args,**kwargs)
+#     def put(self,request,pk,*args,**kwargs):
+#         return self.update(request,pk=pk,*args,**kwargs)
+#
+#     def delete(self,request,pk,*args,**kwargs):
+#         return self.destroy(request,pk=pk,*args,**kwargs)
+
+'''
+Generics
+
+ListAPIView
+CreateAPIView
+RetrieveAPIView
+UpdateAPIView
+DestroyAPIView
+
+ListCreateAPIView
+RetrieveUpdateAPIView
+RetrieveUpdate DestroyAPIView
+'''
+class Employees(generics.CreateAPIView,generics.ListAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
 
-    def get(self,request,*args,**kwargs):
-        return self.list(request,*args,**kwargs)
-
-    def post(self,request,*args,**kwargs):
-        return self.create(request,*args,**kwargs)
+    # def list(self, request, *args, **kwargs):
+    #     self.list(request,*args,**kwargs)
+    # def create(self, request, *args, **kwargs):
+class Employees_obj(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+    lookup_field = 'pk'
