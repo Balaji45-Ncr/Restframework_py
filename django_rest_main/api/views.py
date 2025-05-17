@@ -11,6 +11,11 @@ from rest_framework.mixins import ListModelMixin,RetrieveModelMixin,UpdateModelM
 from rest_framework.views import APIView
 from rest_framework import generics
 from django.core.exceptions import ValidationError
+from rest_framework import viewsets
+from blogs.models import Blog,Comment
+from blogs.serializers import CommentSerializer,BlogSerializer
+
+from rest_framework.decorators import action
 # Create your views here.
 @api_view(['GET','POST'])
 def studentsView(request):
@@ -174,3 +179,40 @@ class Employees_obj(generics.RetrieveUpdateDestroyAPIView):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     lookup_field = 'pk'
+
+'''
+Viewsets:
+
+viewsets.ViewSet ------------> list(),create(),retrieve(),update(),delete()
+
+viewsets.ModelViewSet -------> Takes onyl queryset and serializer_class and automatically provides both pk based and non-pk based operations
+
+'''
+class EmployeesViewSet(viewsets.ViewSet):
+    def list(self,request):
+        queryset=Employee.objects.all()
+        serializers= EmployeeSerializer(queryset,many=True)
+        return Response(serializers.data)
+    def create(self,request):
+        serializer=EmployeeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    def retrieve(self,request,pk=None):
+        employee=get_object_or_404(Employee,pk=pk)
+        serializer=EmployeeSerializer(employee)
+        return Response(serializer.data)
+
+
+class ModelViewset(viewsets.ModelViewSet):
+    queryset = Employee.objects.all()
+    serializer_class = EmployeeSerializer
+
+class BlogView(generics.ListCreateAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+
+class CommentsView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
