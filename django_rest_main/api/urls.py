@@ -15,7 +15,9 @@ urlpatterns=[
     # path('employees/<int:pk>',views.Employees_obj.as_view(),name='employees_obj'),
     path('',include(router.urls)),
     path('blogs/',views.BlogView.as_view()),
-    path('comments/',views.CommentsView.as_view())
+    path('comments/',views.CommentsView.as_view()),
+    path('blogs/<int:pk>',views.BlogDetailView.as_view()),
+    path('comments/<int:pk>',views.CommentsDetailView.as_view()),
 
 
 ]
